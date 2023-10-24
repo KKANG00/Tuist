@@ -31,13 +31,43 @@
 /// THE SOFTWARE.
 
 import Foundation
+import Combine
 
-public enum MovieFetchError: Error {
-  case statusCode
-  case undefined
-  case other(Error)
+public struct Network {
+  private let apiKey = "11f5d72a1af5841fffe89a3d50753bf3"
 
-  static func map(_ error: Error) -> MovieFetchError {
-    return (error as? MovieFetchError) ?? .other(error)
+  public init() {}
+
+  public func fetchTopMovies() -> AnyPublisher<MovieResponse, MovieFetchError> {
+    let config = URLSessionConfiguration.default
+    let session = URLSession(configuration: config)
+    let queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "api_key", value: apiKey),
+      URLQueryItem(name: "language", value: "ko_KR"),
+      URLQueryItem(name: "page", value: "1")
+    ]
+
+    let request = Request(
+      path: "/3/movie/top_rated",
+      queryParams: queryItems)
+    let url = request.toURL()
+    let urlRequest = URLRequest(url: url)
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return session.dataTaskPublisher(for: urlRequest)
+      .tryMap { response -> Data in
+        guard
+          let httpURLResponse = response.response as? HTTPURLResponse,
+          httpURLResponse.statusCode == 200
+        else {
+          throw MovieFetchError.statusCode
+        }
+
+        return response.data
+      }
+      .receive(on: DispatchQueue.main)
+      .decode(type: MovieResponse.self, decoder: decoder)
+      .mapError { MovieFetchError.map($0) }
+      .eraseToAnyPublisher()
   }
 }

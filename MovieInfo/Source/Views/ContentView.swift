@@ -38,10 +38,10 @@ struct ContentView: View {
 
   var body: some View {
     NavigationView {
-      List(viewModel.movieList, id: \.id) { movie in
-        Text("\(movie.title)")
+        List(viewModel.movieList, id: \.id) { movie in
+        Text("🍿 \(movie.title)")
       }
-      .navigationTitle("Movie Info")
+      .navigationTitle("Movie🎬")
     }
   }
 }

@@ -1,8 +1,17 @@
 import ProjectDescription
 
+let projectSettings: Settings = .settings(
+    base: [: ],
+    configurations: [
+        .debug(name: .debug, xcconfig: "config/MovieInfoProject.xcconfig"),
+        .release(name: .release, xcconfig: "config/MovieInfoProject.xcconfig")
+    ],
+    defaultSettings: .none
+)
+
 let project = Project(
     name: "MovieInfo",
-    organizationName: "tuist.test.app",
+    organizationName: "kkang",
     settings: nil,
     targets: [
         Target(
@@ -13,8 +22,10 @@ let project = Project(
             infoPlist: "MovieInfo/Info.plist",
             sources: ["MovieInfo/Source/**"],
             resources: ["MovieInfo/Resources/**"],
-            dependencies: [],
-            settings: nil
+            dependencies: [
+                .project(target: "NetworkKit", path: .relativeToManifest("NetworkKit"))
+            ],
+            settings: projectSettings
         )
     ]
 )
