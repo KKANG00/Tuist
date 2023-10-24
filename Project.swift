@@ -12,9 +12,15 @@ let projectSettings: Settings = .settings(
 let project = Project(
     name: "MovieInfo",
     organizationName: "kkang",
+    packages: [
+        .remote(
+            url: "https://github.com/davidskeck/FetchImage.git",
+            requirement: .upToNextMajor(from: Version(0, 1, 0))
+        )
+    ],
     settings: nil,
     targets: [
-        Target(
+        .init(
             name: "MovieInfo",
             platform: .iOS,
             product: .app,
@@ -23,9 +29,21 @@ let project = Project(
             sources: ["MovieInfo/Source/**"],
             resources: ["MovieInfo/Resources/**"],
             dependencies: [
-                .project(target: "NetworkKit", path: .relativeToManifest("NetworkKit"))
+                .project(target: "NetworkKit", path: .relativeToManifest("NetworkKit")),
+                .package(product: "FetchImage")
             ],
             settings: projectSettings
+        ),
+        .init(
+          name: "MovieInfoTests",
+          platform: .iOS,
+          product: .unitTests,
+          bundleId: "tuist.test.app.test",
+          infoPlist: "MovieInfoTests/Resources/Info.plist",
+          sources: ["MovieInfoTests/Source/**"],
+          dependencies: [
+            .target(name: "MovieInfo")
+          ]
         )
     ]
 )

@@ -36,7 +36,12 @@ import FetchImage
 struct ImageView: View {
   let url: URL
 
-  @StateObject private var image = FetchImage()
+    var image: FetchImage
+
+    init(url: URL) {
+        self.url = url
+        self.image = FetchImage(url: url)
+    }
 
   var body: some View {
     ZStack {
@@ -47,7 +52,7 @@ struct ImageView: View {
         .aspectRatio(contentMode: .fit)
         .clipped()
     }
-    .onAppear { image.load(url) }
-    .onDisappear { image.reset() }
+    .onAppear { image.fetch() }
+    .onDisappear { image.cancel() }
   }
 }
